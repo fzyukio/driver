@@ -20,6 +20,7 @@ const (
 
 	CommitNameParam      = "commitname"
 	CommitEmailParam     = "commitemail"
+	HomeDirParam         = "homedir"
 	DatabaseParam        = "database"
 	MultiStatementsParam = "multistatements"
 	ClientFoundRowsParam = "clientfoundrows"
@@ -73,9 +74,15 @@ func (d *doltDriver) Open(dataSource string) (driver.Conn, error) {
 		return nil, fmt.Errorf("datasource '%s' must include the parameter '%s'", dataSource, CommitEmailParam)
 	}
 
+	homedir := ds.Params[HomeDirParam]
+	if homedir == nil {
+		homedir = []string{""}
+	}
+
 	cfg := config.NewMapConfig(map[string]string{
 		config.UserNameKey:  name[0],
 		config.UserEmailKey: email[0],
+		config.HomeDirKey:   homedir[0],
 	})
 
 	mrEnv, err := LoadMultiEnvFromDir(ctx, cfg, fs, ds.Directory, "0.40.17")
